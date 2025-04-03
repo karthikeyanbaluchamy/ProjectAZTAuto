@@ -1,7 +1,7 @@
 name: Terraform Azure workflow
 on: workflow_dispatch
 jobs:
-  firstjob:
+  terraformjob:
     runs-on: ubuntu-latest
     steps:
       - name: Print the value
