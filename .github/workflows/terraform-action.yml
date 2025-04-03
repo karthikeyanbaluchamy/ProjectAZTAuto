@@ -5,6 +5,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Print the value
-        run: echo "hello world"
-      - name: Print end
-        run: echo "end"
+        run: |
+            echo "hello world"
+            echo "test"
