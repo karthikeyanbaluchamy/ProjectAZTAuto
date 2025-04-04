@@ -4,7 +4,35 @@ jobs:
   terraformjob:
     runs-on: ubuntu-latest
     steps:
-      - name: Print the value
-        run: |
-            echo "hello world"
-            echo "test"
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.  # Specify the Terraform version you need
+      - name: Terraform Init
+        env:
+          ARM_CLIENT_ID: ${{ secrets.AZURE_C_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.AZURE_C_CIR }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_S_ID }}
+          ARM_TENANT_ID: ${{ secrets.AZURE_T_ID }}
+        run: terraform init -backend-config="resource_group_name=${{secrets.BACKEND_AZURE_RG_NAME}}" -backend-config="storage_account_name=${{secrets.BACKEND_AZURE_STORAGE_ACCOUNT_NAME}}" -backend-config="container_name=${{secrets.BACKEND_AZURE_STORAGE_ACCOUNT_CONTAINER_NAME}}" -backend-config="key=${{secrets.BACKEND_AZURE_ACCOUNT_KEY}}"
+        
+      - name: Terraform Plan
+        env:
+          ARM_CLIENT_ID: ${{ secrets.AZURE_C_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.AZURE_C_CIR }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_S_ID }}
+          ARM_TENANT_ID: ${{ secrets.AZURE_T_ID }}
+        run: terraform plan -out=main.tfplan
+      - name: Terraform Apply
+        env:
+          ARM_CLIENT_ID: ${{ secrets.AZURE_C_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.AZURE_C_CIR }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_S_ID }}
+          ARM_TENANT_ID: ${{ secrets.AZURE_T_ID }}
+        run: terraform apply -auto-approve main.tfplan
+     
+    
+          
