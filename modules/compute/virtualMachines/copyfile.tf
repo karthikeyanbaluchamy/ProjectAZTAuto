@@ -1,3 +1,9 @@
+resource "time_sleep" "wait_before_task" {
+  depends_on = [null_resource.addfiles]
+  create_duration = "30s"  # Adjust the duration as needed, e.g., 60 seconds
+}
+
+
 resource "null_resource" "addfiles" {
     count = var.virtual_machine_count
     provisioner "file" {
