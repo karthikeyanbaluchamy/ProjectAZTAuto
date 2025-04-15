@@ -3,12 +3,8 @@ name: Trigger and Read Plan Workflow Outputs
 on:
   workflow_dispatch:
 
-jobs:
-  trigger_plan_workflow:
-    runs-on: ubuntu-latest
-    steps:
-    # Trigger the plan workflow
-    - name: Trigger Plan Azure Workflow
-      id: plan_workflow
-      uses: ./.github/workflows/plan_workflow.yml 
+jobs:    
+  trigger_plan:
+    uses: ./.github/workflows/plan_workflow.yml
+    secrets: inherit
 
