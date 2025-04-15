@@ -3,6 +3,8 @@ on: workflow_dispatch
 jobs:
   plan_workflow:
     runs-on: ubuntu-latest
+    outputs:
+      tfplanexitcode: ${{ steps.planop.outputs.exitcode }}
     steps:
        - name: Check out repository
          uses: actions/checkout@v3
@@ -44,4 +46,24 @@ jobs:
          uses: actions/upload-artifact@v4
          with:
            name: tfplan
-           path: tfplan   
+           path: tfplan 
+       - name: Create html output
+         id: planstr
+         run: |
+           TERRAFORM_PLAN=$(terraform show -no-color tfplan)
+           delimiter="$(openssl rand -hex 8)"
+           echo "summary<<${delimiter}" >> $GITHUB_OUTPUT
+           echo "## Terraform Plan Output" >> $GITHUB_OUTPUT
+           echo "<details><summary>Click to expand</summary>" >> $GITHUB_OUTPUT
+           echo "" >> $GITHUB_OUTPUT
+           echo '```terraform' >> $GITHUB_OUTPUT
+           echo "$TERRAFORM_PLAN" >> $GITHUB_OUTPUT
+           echo '```' >> $GITHUB_OUTPUT
+           echo "</details>" >> $GITHUB_OUTPUT
+           echo "${delimiter}" >> $GITHUB_OUTPUT
+       - name: Publish Terraform Plan to Task Summary
+         env:
+           SUMMARY: ${{ steps.planstr.outputs.summary }}
+         run: |
+           echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY    
+         
