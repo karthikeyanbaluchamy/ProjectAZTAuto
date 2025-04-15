@@ -12,20 +12,3 @@ jobs:
       id: plan_workflow
       uses: ./.github/workflows/plan_workflow.yml 
 
-  read_plan_outputs:
-    needs: trigger_plan_workflow  # This ensures this job only runs after the plan_workflow job finishes
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Check outputs from the plan workflow
-      run: |
-        # Read the output from the plan workflow
-        echo "The Terraform plan exit code was: ${{ needs.trigger_plan_workflow.outputs.tfplanexitcode }}"
-
-        # Optionally use the output in subsequent steps
-        # You can use the output to perform any further actions based on the exit code or other data
-        if [ "${{ needs.trigger_plan_workflow.outputs.tfplanexitcode }}" == "0" ]; then
-          echo "Terraform plan was successful."
-        else
-          echo "Terraform plan failed."
-        fi
