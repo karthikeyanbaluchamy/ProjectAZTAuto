@@ -1,0 +1,47 @@
+name: Terraform Azure workflow
+on: workflow_dispatch
+jobs:
+  plan_workflow:
+    runs-on: ubuntu-latest
+    steps:
+       - name: Check out repository
+         uses: actions/checkout@v3
+
+       - name: Set up Terraform
+         uses: hashicorp/setup-terraform@v2
+         with:
+          terraform_version: latest  
+       - name: Terraform Init
+         env:
+          ARM_CLIENT_ID: ${{ secrets.AZURE_C_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.AZURE_C_CIR }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_S_ID }}
+          ARM_TENANT_ID: ${{ secrets.AZURE_T_ID }}
+         run: terraform init -backend-config="resource_group_name=${{secrets.BACKEND_AZURE_RG_NAME}}" -backend-config="storage_account_name=${{secrets.BACKEND_AZURE_STORAGE_ACCOUNT_NAME}}" -backend-config="container_name=${{secrets.BACKEND_AZURE_STORAGE_ACCOUNT_CONTAINER_NAME}}" -backend-config="key=${{secrets.BACKEND_AZURE_ACCOUNT_KEY}}"
+        
+       - name: Terraform Plan
+         id: planop
+         env:
+          ARM_CLIENT_ID: ${{ secrets.AZURE_C_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.AZURE_C_CIR }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_S_ID }}
+          ARM_TENANT_ID: ${{ secrets.AZURE_T_ID }}
+         run: |
+            export exitcode=0
+            terraform plan -detailed-exitcode -no-color -out tfplan || export exitcode=$?
+          
+            echo "exitcoderesult=$exitcode"
+          
+            echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
+          
+            if [ $exitcode -eq 1 ]; then
+              echo Terraform Plan Failed!
+              exit 1
+            else 
+              exit 0
+            fi
+       - name: Publish Terraform Plan
+         uses: actions/upload-artifact@v4
+         with:
+           name: tfplan
+           path: tfplan   
