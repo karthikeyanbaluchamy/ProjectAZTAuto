@@ -1,5 +1,10 @@
 name: plan Azure workflow
-on: workflow_call
+on: 
+  workflow_call:
+     outputs:
+       tfplanexitcode:
+         description: "Terraform plan exit code"
+         value: ${{ jobs.plan_workflow.outputs.tfplanexitcode }}
 jobs:
   plan_workflow:
     runs-on: ubuntu-latest
