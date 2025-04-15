@@ -1,4 +1,4 @@
-name: Terraform Azure workflow
+name: plan Azure workflow
 on: workflow_dispatch
 jobs:
   plan_workflow:
