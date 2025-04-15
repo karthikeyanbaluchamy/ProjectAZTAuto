@@ -7,4 +7,10 @@ jobs:
   trigger_plan:
     uses: ./.github/workflows/plan_workflow.yml
     secrets: inherit
+  print_ouput:
+    runs-on: ubuntu-latest
+    needs: trigger_plan
+    steps:
+      - name: data from other example
+        run: echo "Exit code:${{ needs.trigger_plan.outputs.tfplanexitcode }}"
 
